@@ -1,0 +1,122 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Produits — CityLunch{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0"><i class="bi bi-box-seam me-2"></i>Produits</h2>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAjout">
+        <i class="bi bi-plus-lg"></i> Ajouter un produit
+    </button>
+</div>
+
+<div class="card mb-4">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nom</th>
+                    <th>Prix</th>
+                    <th>Description</th>
+                    <th>Créé le</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for produit in produits %}
+                <tr>
+                    <td>{{ produit.id }}</td>
+                    <td class="fw-semibold">{{ produit.nom }}</td>
+                    <td><span class="badge bg-success">{{ produit.prix|number_format(2, ',', ' ') }} €</span></td>
+                    <td class="text-muted">{{ produit.description ?? '—' }}</td>
+                    <td>{{ produit.createdAt|date('d/m/Y') }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalEdit{{ produit.id }}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <form method="post" action="{{ path('web_produits_delete', {id: produit.id}) }}" class="d-inline"
+                            onsubmit="return confirm('Supprimer ce produit ?')">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+
+                {# Modal édition #}
+                <div class="modal fade" id="modalEdit{{ produit.id }}" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Modifier — {{ produit.nom }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form method="post" action="{{ path('web_produits_update', {id: produit.id}) }}">
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Nom</label>
+                                        <input type="text" name="nom" class="form-control" value="{{ produit.nom }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Prix (€)</label>
+                                        <input type="number" name="prix" step="0.01" class="form-control" value="{{ produit.prix }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Description</label>
+                                        <textarea name="description" class="form-control" rows="3">{{ produit.description }}</textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">Aucun produit enregistré.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{# Modal ajout #}
+<div class="modal fade" id="modalAjout" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ajouter un produit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{{ path('web_produits_create') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nom <span class="text-danger">*</span></label>
+                        <input type="text" name="nom" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Prix (€) <span class="text-danger">*</span></label>
+                        <input type="number" name="prix" step="0.01" min="0.01" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

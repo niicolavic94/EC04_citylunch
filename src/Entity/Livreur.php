@@ -3,40 +3,47 @@
 namespace App\Entity;
 
 use App\Repository\LivreurRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: LivreurRepository::class)]
+#[Groups(['livreur:read'])]
 class Livreur implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['livreur:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Le nom est obligatoire.")]
+    #[Groups(['livreur:read'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 180, unique: true)]
     #[Assert\NotBlank(message: "L'email est obligatoire.")]
     #[Assert\Email(message: "L'email {{ value }} n'est pas valide.")]
+    #[Groups(['livreur:read'])]
     private ?string $email = null;
 
     #[ORM\Column]
     private array $roles = [];
 
     #[ORM\Column]
-    #[Assert\NotBlank(message: "Le mot de passe est obligatoire.")]
+    #[Ignore]
     private ?string $password = null;
 
     #[ORM\Column]
+    #[Groups(['livreur:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\OneToOne(mappedBy: 'livreur', targetEntity: Sac::class, cascade: ['persist', 'remove'])]
+    #[Groups(['livreur:read'])]
     private ?Sac $sac = null;
 
     // Getters et Setters
@@ -74,9 +81,7 @@ class Livreur implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        $roles = $this->roles;
-        $roles[] = 'ROLE_LIVREUR';
-        return array_unique($roles);
+        return ['ROLE_LIVREUR'];
     }
 
     public function setRoles(array $roles): static

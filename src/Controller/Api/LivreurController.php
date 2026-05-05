@@ -78,7 +78,7 @@ class LivreurController extends AbstractController
             ->text("Bonjour {$livreur->getNom()},\n\nVotre mot de passe est : $password\n\nCordialement,\nL'équipe CityLunch");
         $this->mailer->send($email);
 
-        return $this->json($livreur, 201);
+        return $this->json($livreur, 201, [], ['groups' => ['livreur:read']]);
     }
 
     #[Route('', methods: ['GET'])]
@@ -91,7 +91,7 @@ class LivreurController extends AbstractController
     public function list(): JsonResponse
     {
         $livreurs = $this->em->getRepository(Livreur::class)->findAll();
-        return $this->json($livreurs);
+        return $this->json($livreurs, 200, [], ['groups' => ['livreur:read']]);
     }
 
     #[Route('/{id}', methods: ['GET'])]
@@ -108,7 +108,7 @@ class LivreurController extends AbstractController
         if (!$livreur) {
             return $this->json(['error' => 'Livreur non trouvé'], 404);
         }
-        return $this->json($livreur);
+        return $this->json($livreur, 200, [], ['groups' => ['livreur:read']]);
     }
 
     #[Route('/{id}', methods: ['PUT'])]
@@ -139,7 +139,7 @@ class LivreurController extends AbstractController
         }
 
         $this->em->flush();
-        return $this->json($livreur);
+        return $this->json($livreur, 200, [], ['groups' => ['livreur:read']]);
     }
 
     #[Route('/{id}', methods: ['DELETE'])]
